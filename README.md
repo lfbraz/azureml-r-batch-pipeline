@@ -142,7 +142,7 @@ from azureml.widgets import RunDetails
 RunDetails(pipeline_run).show()
 ```
 
-[](images/azureml-pipeline-execution-log.jpg)
+![](/images/azureml-pipeline-execution-log.jpg)
 
 ## Publish the pipeline
 After the test we can publish the pipeline, so it will be available to be triggered outside the Azure ML (for example from an Azure Data Factory Pipeline).

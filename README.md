@@ -1,5 +1,5 @@
 # Azure ML Batch Pipeline with change based trigger
-In this tutorial, we show how to create an Azure ML Pipeline that will be started from a change-based trigger. As an example, we demonstrate a scenario in which new audio files (.mp3) are added to blob storage, triggering a ML pipeline for processing these files and output the result to a SQL Database. The full notebook can be found [here]()
+In this tutorial, we show how to create an Azure ML Pipeline that will be started from a change-based trigger. As an example, we demonstrate a scenario in which new audio files (.mp3) are added to blob storage, triggering a ML pipeline for processing these files and output the result to a SQL Database. The full notebook can be found [here](./notebooks/create-azureml-batch-pipeline.ipynb)
 
 ## Requirements
 

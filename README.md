@@ -19,7 +19,7 @@ print('Workspace name: ' + ws.name,
 ```
 
 ## Get Computer Cluster
-In this example we will use a existing cluster, however you can create a new one using the [SDK](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-attach-compute-cluster?tabs=python).
+In this example we will use an existing cluster, however you can create a new one using the [SDK](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-attach-compute-cluster?tabs=python).
 ```python
 from azureml.core.compute import ComputeTarget, AmlCompute
 from azureml.core.compute_target import ComputeTargetException
@@ -34,7 +34,7 @@ except ComputeTargetException:
 ```
 
 ## Configure the environment
-We will create an [environment](https://docs.microsoft.com/en-us/azure/machine-learning/concept-environments) using a [`Dockerfile`](Dockerfile). This environment contains an R image as well as some dependencies required to run the following examples.
+We will create an [environment](https://docs.microsoft.com/en-us/azure/machine-learning/concept-environments) using a [`Dockerfile`](Dockerfile). This environment contains a R image as well as some dependencies required to run the following examples.
 
 ```python
 from azureml.core import Environment
@@ -65,7 +65,7 @@ input_mp3_data_pipeline_param = (PipelineParameter(name="input_mp3_data", defaul
 ```
 
 ### Set up an intermediate output
-Now we set up an intermediate output. It can be used for example as input to next steps. We alse use the [Azure ML default storage](https://docs.microsoft.com/en-us/azure/machine-learning/concept-azure-machine-learning-architecture) to persist these data.
+Now we set up an intermediate output. It can be used for example as input to next steps. We also use the [Azure ML default storage](https://docs.microsoft.com/en-us/azure/machine-learning/concept-azure-machine-learning-architecture) to persist these data.
 ```python
 
 from azureml.data import OutputFileDatasetConfig
@@ -78,7 +78,7 @@ output_data = OutputFileDatasetConfig(name="output_data",
 ```
 
 ### Create the steps
-With the input and an intermediate output configured we can set up the pipelines' steps. We will have two steps: train and persist. The first one is a very simple [R script](R-model.R) receiving both input data (mp3 and rds) and producing an output (for the next step). The second one is a [Python script](Persist-Data.py) that receive (as input) the result from the first step and persist into a SQL Database.
+With the input and the intermediate output configured we can set up the pipelines' steps. We will have two steps: train and persist. The first one is a very simple [R script](R-model.R) receiving both input data (mp3 and rds) and producing an output (for the next step). The second one is a [Python script](Persist-Data.py) that receive (as input) the result from the first step and persist into a SQL Database.
 
 ```python
 
@@ -117,14 +117,14 @@ persist_data = PythonScriptStep(
 Finally we can submit the pipeline, passing the input parameters (for example an sample audio).
 
 ```python
-rom azureml.pipeline.core import Pipeline
+from azureml.pipeline.core import Pipeline
 from azureml.core import Experiment
 
 pipeline = Pipeline(workspace=ws, steps=[train, persist_data])
 
 # Parameters to tests our pipeline
-test_rds_path = DataPath(datastore=datastore, path_on_datastore='r-pipeline-data/rds/accidents.Rd')
-test_mp3_path = DataPath(datastore=datastore, path_on_datastore='r-pipeline-data/mp3/file_example_MP3_5MG_01.mp3')
+test_rds_path = DataPath(datastore=datastore, path_on_datastore='./rds/accidents.Rd')
+test_mp3_path = DataPath(datastore=datastore, path_on_datastore='./mp3/file_example_MP3_5MG_01.mp3')
 
 experiment_name = 'R-batch-scoring'
 pipeline_run = Experiment(ws, experiment_name).submit(pipeline, 
@@ -169,4 +169,20 @@ reactive_schedule = Schedule.create(ws,
                                     path_on_datastore='r-pipeline-data/mp3/' 
                                    )
 
+```
+## Set secrets to Key Vault
+In this example we use [Azure Key Vault](https://azure.microsoft.com/pt-br/services/key-vault/) to protect some sensitive data (username, password, etc.). We can use the default Azure Key Vault integrated to the Azure ML Workspace for this task, so it will be easier to get the secrets during the Pipelines' execution. Please check [this doc](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-use-secrets-in-runs) to obtain more details about this process.
+
+```python
+keyvault = ws.get_default_keyvault()
+
+username = '<your-user-name>'
+password = '<your-password>'
+database = '<your-database>'
+server = '<your-server>'
+
+keyvault.set_secret(name="username", value = username)
+keyvault.set_secret(name="password", value = username)
+keyvault.set_secret(name="database", value = database)
+keyvault.set_secret(name="server", value = server)
 ```

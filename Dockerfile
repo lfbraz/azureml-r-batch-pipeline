@@ -1,8 +1,11 @@
 FROM rocker/tidyverse:4.0.0-ubuntu18.04
 
+RUN apt-get update && apt-get install -y gnupg2 && \
+    apt-get install -y curl
+
 # SQL Database Client repos
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-RUN curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+RUN curl -s -N https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl -s -N https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
 
 # Install python
 RUN apt-get update -qq && \

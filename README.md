@@ -1,5 +1,5 @@
 # Azure ML Batch Pipeline with change based trigger
-In this tutorial, we show how to create an Azure ML Pipeline that will be started from a change-based trigger. As an example, we demonstrate a scenario in which new audio files (.mp3) are added to blob storage, triggering a ML pipeline for processing these files and output the result to a SQL Database. The full notebook can be found [here](./notebooks/create-azureml-batch-pipeline.ipynb)
+In this tutorial, we show how to create an Azure ML Pipeline that will be started from a change-based trigger. As an example, we demonstrate a scenario in which new audio files (.mp3) are added to blob storage, triggering an ML pipeline for processing these files and output the result to a SQL Database. The full notebook can be found [here](./notebooks/create-azureml-batch-pipeline.ipynb)
 
 ## Requirements
 
@@ -34,7 +34,7 @@ except ComputeTargetException:
 ```
 
 ## Configure the environment
-We will create an [environment](https://docs.microsoft.com/en-us/azure/machine-learning/concept-environments) using a [`Dockerfile`](Dockerfile). This environment contains a R image as well as some dependencies required to run the following examples.
+We will create an [environment](https://docs.microsoft.com/en-us/azure/machine-learning/concept-environments) using a [`Dockerfile`](Dockerfile). This environment contains an R base image as well as some dependencies required to run the following examples.
 
 ```python
 from azureml.core import Environment
@@ -46,7 +46,7 @@ env = Environment.from_dockerfile(name='r_env', dockerfile='Dockerfile')
 Now with the dependencies we will configure an [Azure ML Batch Pipeline](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-machine-learning-pipelines). For more details about how to create pipelines we encourage you to take a look in this [MS Learn module](https://docs.microsoft.com/en-us/learn/modules/create-pipelines-in-aml/).
 
 ### Set up input parameters
-In this example we use [pipeline parameters](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.graph.pipelineparameter?view=azure-ml-py) to be able to submit experiment passing some default values (very useful to test the pipeline). We use two datasets, one for the mp3 file and another one to read a rds file from our Data Store (a blob storage).
+In this example we use [pipeline parameters](https://docs.microsoft.com/en-us/python/api/azureml-pipeline-core/azureml.pipeline.core.graph.pipelineparameter?view=azure-ml-py) to be able to submit experiment passing some default values (very useful to test the pipeline). We use two datasets, one for the mp3 file and another one to read an rds file from our Data Store (blob storage).
 
 ```python
 
@@ -65,7 +65,7 @@ input_mp3_data_pipeline_param = (PipelineParameter(name="input_mp3_data", defaul
 ```
 
 ### Set up an intermediate output
-Now we set up an intermediate output. It can be used for example as input to next steps. We also use the [Azure ML default storage](https://docs.microsoft.com/en-us/azure/machine-learning/concept-azure-machine-learning-architecture) to persist these data.
+Now we set up an intermediate output. It can be used for example as input to the next steps. We also use the [Azure ML default storage](https://docs.microsoft.com/en-us/azure/machine-learning/concept-azure-machine-learning-architecture) to persist these data.
 ```python
 
 from azureml.data import OutputFileDatasetConfig
@@ -78,7 +78,7 @@ output_data = OutputFileDatasetConfig(name="output_data",
 ```
 
 ### Create the steps
-With the input and the intermediate output configured we can set up the pipelines' steps. We will have two steps: train and persist. The first one is a very simple [R script](R-model.R) receiving both input data (mp3 and rds) and producing an output (for the next step). The second one is a [Python script](Persist-Data.py) that receive (as input) the result from the first step and persist into a SQL Database.
+With the input and the intermediate output configured we can set up the pipelines' steps. We will have two steps: train and persist. The first one is a very simple [R script](R-model.R) receiving both input data (mp3 and rds) and producing an output (for the next step). The second one is a [Python script](Persist-Data.py) that receives (as input) the result from the first step and persists into a SQL Database.
 
 ```python
 
@@ -116,7 +116,7 @@ persist_data = PythonScriptStep(
 ```
 
 ## Submit the pipeline
-Finally we can submit the pipeline, passing the input parameters (for example an sample audio).
+Finally we can submit the pipeline, passing the input parameters (for example sample audio).
 
 ```python
 from azureml.pipeline.core import Pipeline
@@ -173,7 +173,7 @@ reactive_schedule = Schedule.create(ws,
 
 ```
 ## Set secrets to Key Vault
-In this example we use [Azure Key Vault](https://azure.microsoft.com/pt-br/services/key-vault/) to protect some sensitive data (username, password, etc.). We can use the default Azure Key Vault integrated to the Azure ML Workspace for this task, so it will be easier to get the secrets during the Pipelines' execution. Please check [this doc](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-use-secrets-in-runs) to obtain more details about this process.
+In this example we use [Azure Key Vault](https://azure.microsoft.com/pt-br/services/key-vault/) to protect some sensitive data (username, password, etc.). We can use the default Azure Key Vault integrated into the Azure ML Workspace for this task, so it will be easier to get the secrets during the Pipelines' execution. Please check [this doc](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-use-secrets-in-runs) to obtain more details about this process.
 
 ```python
 keyvault = ws.get_default_keyvault()

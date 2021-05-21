@@ -1,5 +1,5 @@
 # Azure ML Batch Pipeline with change based trigger
-In this tutorial, we show how to create an Azure ML Pipeline that will be started from a change-based trigger. As an example, we demonstrate a scenario in which new audio files (.mp3) are added to blob storage, triggering a ML pipeline for processing these files and output the result to a SQL Database.
+In this tutorial, we show how to create an Azure ML Pipeline that will be started from a change-based trigger. As an example, we demonstrate a scenario in which new audio files (.mp3) are added to blob storage, triggering a ML pipeline for processing these files and output the result to a SQL Database. The full notebook can be found [here]()
 
 ## Requirements
 
@@ -81,6 +81,8 @@ output_data = OutputFileDatasetConfig(name="output_data",
 With the input and the intermediate output configured we can set up the pipelines' steps. We will have two steps: train and persist. The first one is a very simple [R script](R-model.R) receiving both input data (mp3 and rds) and producing an output (for the next step). The second one is a [Python script](Persist-Data.py) that receive (as input) the result from the first step and persist into a SQL Database.
 
 ```python
+
+source_directory = '.'
 
 train_config = ScriptRunConfig(source_directory=source_directory,
                             command=['Rscript R-model.R '
